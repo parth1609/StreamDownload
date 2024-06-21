@@ -1,7 +1,20 @@
 
 # StramDownload
 
+The YouTube and Instagram Video Downloader project aims to provide users with a convenient web application to download videos from two popular social media platforms, YouTube and Instagram. 
 
+## Features
+
+1. <b> Platform Support: </b>
+
+    YouTube: Allows downloading of YouTube videos in various resolutions and formats).
+    Instagram: Enables users to download videos from Instagram by entering the video URL.
+
+2. <b> Streamlit Integration </b>
+
+    Utilizes Streamlit for the front-end development, ensuring a responsive and interactive user interface.
+    Streamlit components such as input fields, buttons, and download functionalities are integrated seamlessly.
+   
 ## Tech Stack
 
 1. **[streamlit](https://streamlit.io/)** 
@@ -10,14 +23,6 @@
 
 
 3. **[instaloader ](https://pypi.org/project/instaloader/)**
-
-
-## Features
-
-- Light/dark mode toggle
-- Live previews
-- Fullscreen mode
-- Cross platform
 
 
 ## Clone The Repository 
