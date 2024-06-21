@@ -13,13 +13,13 @@ if not os.path.exists(DOWNLOAD_DIR):
 def download_youtube_video(url, resolution):
     try:
         yt = YouTube(url, on_progress_callback=on_progress)
-        st.write(f"Available streams: {yt.streams}")
-        stream = yt.streams.filter(res=resolution, file_extension='mp4').first()
+        st.write(f"Available streams: {yt.streams.filter(progressive=True)}")
+        stream = yt.streams.filter(progressive=True, res=resolution, file_extension='mp4').first()
         if stream:
             stream.download(output_path=DOWNLOAD_DIR)
             return stream.default_filename
         else:
-            st.write(f"No stream found for resolution {resolution}")
+            st.write(f"No progressive stream found for resolution {resolution}")
             return None
     except Exception as e:
         st.error(f"An error occurred: {e}")
@@ -45,7 +45,7 @@ def download_youtube_playlist(url, resolution):
         st.write(f"Playlist videos: {pl.video_urls}")
         filenames = []
         for video in pl.videos:
-            stream = video.streams.filter(res=resolution, file_extension='mp4').first()
+            stream = video.streams.filter(progressive=True, res=resolution, file_extension='mp4').first()
             if stream:
                 stream.download(output_path=DOWNLOAD_DIR)
                 filenames.append(stream.default_filename)
