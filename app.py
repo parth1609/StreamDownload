@@ -1,7 +1,6 @@
 import streamlit as st
 from pytube import YouTube, Playlist
 from pytube.cli import on_progress
-import instaloader
 import os
 
 # Helper functions for YouTube
@@ -10,7 +9,7 @@ def download_youtube_video(url, resolution):
     stream = yt.streams.filter(res=resolution, file_extension='mp4').first()
     if stream:
         stream.download(output_path='downloads')
-        return stream.default_filename
+        return os.path.join('downloads', stream.default_filename)
     else:
         return None
 
@@ -19,7 +18,7 @@ def download_youtube_audio(url):
     stream = yt.streams.filter(only_audio=True).first()
     if stream:
         stream.download(output_path='downloads')
-        return stream.default_filename
+        return os.path.join('downloads', stream.default_filename)
     else:
         return None
 
@@ -30,27 +29,11 @@ def download_youtube_playlist(url, resolution):
         stream = video.streams.filter(res=resolution, file_extension='mp4').first()
         if stream:
             stream.download(output_path='downloads')
-            filenames.append(stream.default_filename)
+            filenames.append(os.path.join('downloads', stream.default_filename))
     return filenames
 
-# Helper functions for Instagram
-def download_instagram_post(url):
-    L = instaloader.Instaloader()
-    post = instaloader.Post.from_shortcode(L.context, url.split("/")[-2])
-    L.download_post(post, target='downloads')
-    return post.shortcode
-
-def download_instagram_video(url):
-    L = instaloader.Instaloader()
-    post = instaloader.Post.from_shortcode(L.context, url.split("/")[-2])
-    if post.is_video:
-        L.download_post(post, target='downloads')
-        return post.shortcode
-    else:
-        return None
-
 # Streamlit app
-st.title("Video Downloader")
+st.title("YouTube Downloader")
 
 st.header("YouTube Downloader")
 youtube_url = st.text_input("Enter YouTube URL")
@@ -61,14 +44,18 @@ if youtube_url:
         if st.button("Download Video"):
             filename = download_youtube_video(youtube_url, resolution)
             if filename:
-                st.success(f"Video downloaded: {filename}")
+                st.success(f"Video downloaded: {os.path.basename(filename)}")
+                with open(filename, "rb") as file:
+                    st.download_button(label="Download Video", data=file, file_name=os.path.basename(filename), mime="video/mp4")
             else:
                 st.error("Failed to download video.")
     elif option == "Audio":
         if st.button("Download Audio"):
             filename = download_youtube_audio(youtube_url)
             if filename:
-                st.success(f"Audio downloaded: {filename}")
+                st.success(f"Audio downloaded: {os.path.basename(filename)}")
+                with open(filename, "rb") as file:
+                    st.download_button(label="Download Audio", data=file, file_name=os.path.basename(filename), mime="audio/mp4")
             else:
                 st.error("Failed to download audio.")
     elif option == "Playlist":
@@ -77,27 +64,11 @@ if youtube_url:
             filenames = download_youtube_playlist(youtube_url, resolution)
             if filenames:
                 st.success(f"Playlist downloaded: {len(filenames)} videos")
+                for filename in filenames:
+                    with open(filename, "rb") as file:
+                        st.download_button(label=f"Download {os.path.basename(filename)}", data=file, file_name=os.path.basename(filename), mime="video/mp4")
             else:
                 st.error("Failed to download playlist.")
-
-st.header("Instagram Downloader")
-instagram_url = st.text_input("Enter Instagram Post URL")
-if instagram_url:
-    option = st.selectbox("Choose download option", ["Post", "Video"])
-    if option == "Post":
-        if st.button("Download Post"):
-            shortcode = download_instagram_post(instagram_url)
-            if shortcode:
-                st.success(f"Post downloaded: {shortcode}")
-            else:
-                st.error("Failed to download post.")
-    elif option == "Video":
-        if st.button("Download Video"):
-            shortcode = download_instagram_video(instagram_url)
-            if shortcode:
-                st.success(f"Video downloaded: {shortcode}")
-            else:
-                st.error("Failed to download video.")
 
 # Ensure the downloads directory exists
 if not os.path.exists('downloads'):
