@@ -33,9 +33,8 @@ def download_youtube_playlist(url, resolution):
     return filenames
 
 # Streamlit app
-st.title("YouTube Downloader")
+st.title("StreamDownload")
 
-st.header("YouTube Downloader")
 youtube_url = st.text_input("Enter YouTube URL")
 if youtube_url:
     option = st.selectbox("Choose download option", ["Video", "Audio", "Playlist"])
